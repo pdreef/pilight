@@ -46,8 +46,8 @@ static int checkArguments(struct rules_actions_t *obj) {
 	char *stmp = NULL;
 	int nrvalues = 0;
 
-	jphonenumber = json_find_member(obj->arguments, "PHONENUMBER");
-	jtts = json_find_member(obj->arguments, "TTS");
+	jphonenumber = json_find_member(obj->parsedargs, "PHONENUMBER");
+	jtts = json_find_member(obj->parsedargs, "TTS");
 
 	if(jphonenumber == NULL) {
 		logprintf(LOG_ERR, "Sipcall action is missing a \"PHONENUMBER\"");
@@ -83,7 +83,7 @@ static int checkArguments(struct rules_actions_t *obj) {
 	}
 
 	// Check if mandatory settings are present in config
-/*	if(settings_find_string("sip-program", &stmp) != EXIT_SUCCESS) {
+	if(settings_find_string("sip-program", &stmp) != EXIT_SUCCESS) {
 		logprintf(LOG_ERR, "Sipcall: setting \"sip-program\" is missing in config");
 		return -1;
 	}	
@@ -98,15 +98,19 @@ static int checkArguments(struct rules_actions_t *obj) {
 	if(settings_find_string("sip-password", &stmp) != EXIT_SUCCESS) {
 		logprintf(LOG_ERR, "Sipcall: setting \"sip-password\" is missing in config");
 		return -1;
+	}	
+    if(settings_find_string("sip-ttsfile", &stmp) != EXIT_SUCCESS) {
+		logprintf(LOG_ERR, "Sipcall: setting \"sip-ttsfile\" is missing in config");
+		return -1;
 	}
-    */
+
 	return 0;
 }
 
 static void *thread(void *param) {
 	struct rules_actions_t *pth = (struct rules_actions_t *)param;
 	// struct rules_t *obj = pth->obj;
-	struct JsonNode *arguments = pth->arguments;
+	struct JsonNode *arguments = pth->parsedargs;
 	struct JsonNode *jphonenumber = NULL;
 	struct JsonNode *jtts = NULL;
 	struct JsonNode *jvalues1 = NULL;
@@ -116,7 +120,7 @@ static void *thread(void *param) {
 
 	action_sipcall->nrthreads++;
 
-	char *ssipprogram = NULL, *ssipdomain = NULL, *ssipuser = NULL, *ssippassword = NULL;
+	char *ssipprogram = NULL, *ssipdomain = NULL, *ssipuser = NULL, *ssippassword = NULL, *ssipttsfile = NULL;
 	char sipcmd[200]; 
 
 	jphonenumber = json_find_member(arguments, "PHONENUMBER");
@@ -132,16 +136,15 @@ static void *thread(void *param) {
 			if(jval1 != NULL && jval2 != NULL &&
 				jval1->tag == JSON_STRING && jval2->tag == JSON_STRING) {
 
-				//sip settings
-				/*
+				// read sip settings
                 settings_find_string("sip-program", &ssipprogram);
 				settings_find_string("sip-domain", &ssipdomain);
 				settings_find_string("sip-user", &ssipuser);
 				settings_find_string("sip-password", &ssippassword);
-                */
-
-				//sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_ );
-				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\"  -ttsf %s", "/home/pi/sipcall/sipcall", "fritz.box", "621", "6211", jval1->string_, jval2->string_, "/home/pi/sipcall/play.wav" );
+				settings_find_string("sip-ttsfile", &ssipttsfile);
+                
+				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, , jval3->string_ );
+				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", "/home/pi/sipcall/sipcall", "fritz.box", "621", "6211", jval1->string_, jval2->string_, "/home/pi/sipcall/play.wav" );
 				if(system(sipcmd) != 0) {
 					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
 				}
@@ -169,7 +172,7 @@ void actionSipcallInit(void) {
 
 	options_add(&action_sipcall->options, 'a', "PHONENUMBER", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
 	options_add(&action_sipcall->options, 'b', "TTS", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
-	
+
 	action_sipcall->run = &run;
 	action_sipcall->checkArguments = &checkArguments;
 }
@@ -179,7 +182,7 @@ void compatibility(struct module_t *module) {
 	module->name = "Sipcall";
 	module->version = "1.0";
 	module->reqversion = "6.0";
-	module->reqcommit = "0";
+	module->reqcommit = "152";
 }
 
 void init(void) {

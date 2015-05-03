@@ -563,6 +563,70 @@ static int settings_parse(JsonNode *root) {
 			} else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
+        
+        // settings for sipcall    
+        } else if(strcmp(jsettings->key, "sip-program") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a program string (e.e. '/home/pi/sipcall/sipcall')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a program string (e.e. '/home/pi/sipcall/sipcall')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+        } else if(strcmp(jsettings->key, "sip-domain") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a domain string (e.e. 'fritz.box')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a domain string (e.e. 'fritz.box')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+        } else if(strcmp(jsettings->key, "sip-user") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a user string (e.e. '621')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a user string (e.e. '621')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+        } else if(strcmp(jsettings->key, "sip-password") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+        } else if(strcmp(jsettings->key, "sip-ttsfile") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttsfile string (e.g. '/home/pi/sipcall/play.wav')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttsfile string (e.g. '/home/pi/sipcall/play.wav')", jsettings->key);
+				have_error = 1;
+				goto clear;
+			} else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+        // end sipcall            
+            
 #endif //EVENTS
 		} else {
 			logprintf(LOG_ERR, "config setting \"%s\" is invalid", jsettings->key);
