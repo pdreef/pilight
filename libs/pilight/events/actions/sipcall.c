@@ -109,8 +109,7 @@ static int checkArguments(struct rules_actions_t *obj) {
 
 static void *thread(void *param) {
 	struct rules_actions_t *pth = (struct rules_actions_t *)param;
-	// struct rules_t *obj = pth->obj;
-	struct JsonNode *arguments = pth->parsedargs;
+    struct JsonNode *arguments = pth->parsedargs;
 	struct JsonNode *jphonenumber = NULL;
 	struct JsonNode *jtts = NULL;
 	struct JsonNode *jvalues1 = NULL;
@@ -143,8 +142,9 @@ static void *thread(void *param) {
 				settings_find_string("sip-password", &ssippassword);
 				settings_find_string("sip-ttsfile", &ssipttsfile);
                 
-				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, , jval3->string_ );
-				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", "/home/pi/sipcall/sipcall", "fritz.box", "621", "6211", jval1->string_, jval2->string_, "/home/pi/sipcall/play.wav" );
+				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts %s -ttsf %s", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, ssipttsfile);
+				logprintf(LOG_DEBUG, sipcmd);
+				//sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts \"%s\" -ttsf %s", "/home/pi/sipcall/sipcall", "fritz.box", "621", "6211", jval1->string_, jval2->string_, "/home/pi/sipcall/play.wav" );
 				if(system(sipcmd) != 0) {
 					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
 				}
@@ -179,7 +179,7 @@ void actionSipcallInit(void) {
 
 #if defined(MODULE) && !defined(_WIN32)
 void compatibility(struct module_t *module) {
-	module->name = "Sipcall";
+	module->name = "sipcall";
 	module->version = "1.0";
 	module->reqversion = "6.0";
 	module->reqcommit = "152";
