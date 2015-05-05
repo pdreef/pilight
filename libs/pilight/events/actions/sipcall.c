@@ -183,7 +183,7 @@ static void *thread(void *param) {
 		}
 	}
 	// TTSFILE is given, no tts
-	if(jphonenumber != NULL && jtts != NULL) {
+	if(jphonenumber != NULL && jttsfile != NULL) {
 		logprintf(LOG_DEBUG, "using TTSFILE\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jttsfile, "value");
