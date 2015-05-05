@@ -164,6 +164,7 @@ static void *thread(void *param) {
 	
 	// TTS is given
 	if(jphonenumber != NULL && jtts != NULL) {
+		logprintf(LOG_DEBUG, "using TTS\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jtts, "value");
 
@@ -173,7 +174,7 @@ static void *thread(void *param) {
 			if(jval1 != NULL && jval2 != NULL &&
 				jval1->tag == JSON_STRING && jval2->tag == JSON_STRING) {
                
-				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts %s -ttsf %s", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, ssipttspath);
+				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts %s -ttsf %s/play.wav", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, ssipttspath);
 				logprintf(LOG_DEBUG, sipcmd);
 				if(system(sipcmd) != 0) {
 					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
@@ -183,7 +184,7 @@ static void *thread(void *param) {
 	}
 	// TTSFILE is given, no tts
 	if(jphonenumber != NULL && jtts != NULL) {
-		logprintf(LOG_DEBUG, "using TTS\n");
+		logprintf(LOG_DEBUG, "using TTSFILE\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jttsfile, "value");
 
