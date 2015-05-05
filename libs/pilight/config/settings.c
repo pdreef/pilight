@@ -613,13 +613,13 @@ static int settings_parse(JsonNode *root) {
 			} else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        } else if(strcmp(jsettings->key, "sip-ttsfile") == 0) {
+        } else if(strcmp(jsettings->key, "sip-ttspath") == 0) {
 			if(jsettings->tag != JSON_STRING) {
-				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttsfile string (e.g. '/home/pi/sipcall/play.wav')", jsettings->key);
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttspath string (e.g. '/home/pi/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
 			} else if(jsettings->string_ == NULL) {
-				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttsfile string (e.g. '/home/pi/sipcall/play.wav')", jsettings->key);
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttspath string (e.g. '/home/pi/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
 			} else {
