@@ -183,6 +183,7 @@ static void *thread(void *param) {
 	}
 	// TTSFILE is given, no tts
 	if(jphonenumber != NULL && jtts != NULL) {
+		logprintf(LOG_DEBUG, "using TTS\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jttsfile, "value");
 
@@ -203,6 +204,7 @@ static void *thread(void *param) {
 	
 		// TTS is given, use play.wav as ttsfile
 	if(jphonenumber != NULL && jtts != NULL) {
+		logprintf(LOG_DEBUG, "using TTS\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jttsfile, "value");
 
