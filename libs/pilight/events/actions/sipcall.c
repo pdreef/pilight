@@ -240,7 +240,7 @@ void actionSipcallInit(void) {
 
 	options_add(&action_sipcall->options, 'a', "PHONENUMBER", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
 	options_add(&action_sipcall->options, 'b', "TTS", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
-	options_add(&action_sipcall->options, 'c', "TTSFILE", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
+	options_add(&action_sipcall->options, 'b', "TTSFILE", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_STRING, NULL, NULL);
 
 	action_sipcall->run = &run;
 	action_sipcall->checkArguments = &checkArguments;
