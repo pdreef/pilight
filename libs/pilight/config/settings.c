@@ -14,7 +14,7 @@
 
 	You should have received a copy of the GNU General Public License
 	along with pilight. If not, see	<http://www.gnu.org/licenses/>
-*/
+	*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #ifndef _WIN32
-	#include <regex.h>
+#include <regex.h>
 #endif
 #include <sys/stat.h>
 #include <time.h>
@@ -36,7 +36,7 @@
 #include "../core/log.h"
 
 #ifndef _WIN32
-	#include "../../wiringx/wiringX.h"
+#include "../../wiringx/wiringX.h"
 #endif
 
 #include "settings.h"
@@ -63,12 +63,12 @@ static void settings_add_string(const char *name, char *value) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
-	if((snode->name = MALLOC(strlen(name)+1)) == NULL) {
+	if((snode->name = MALLOC(strlen(name) + 1)) == NULL) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
 	strcpy(snode->name, name);
-	if((snode->string_ = MALLOC(strlen(value)+1)) == NULL) {
+	if((snode->string_ = MALLOC(strlen(value) + 1)) == NULL) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
@@ -82,7 +82,8 @@ static void settings_add_string(const char *name, char *value) {
 			tmp = tmp->next;
 		}
 		tmp->next = snode;
-	} else {
+	}
+	else {
 		snode->next = settings;
 		settings = snode;
 	}
@@ -96,7 +97,7 @@ static void settings_add_number(const char *name, int value) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
-	if((snode->name = MALLOC(strlen(name)+1)) == NULL) {
+	if((snode->name = MALLOC(strlen(name) + 1)) == NULL) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
@@ -111,7 +112,8 @@ static void settings_add_number(const char *name, int value) {
 			tmp = tmp->next;
 		}
 		tmp->next = snode;
-	} else {
+	}
+	else {
 		snode->next = settings;
 		settings = snode;
 	}
@@ -163,14 +165,14 @@ static int settings_parse(JsonNode *root) {
 #endif
 	int own_port = -1;
 
-	char *webgui_tpl = MALLOC(strlen(WEBGUI_TEMPLATE)+1);
+	char *webgui_tpl = MALLOC(strlen(WEBGUI_TEMPLATE) + 1);
 	if(webgui_tpl == NULL) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
 	}
 	strcpy(webgui_tpl, WEBGUI_TEMPLATE);
 
-	char *webgui_root = MALLOC(strlen(WEBSERVER_ROOT)+1);
+	char *webgui_root = MALLOC(strlen(WEBSERVER_ROOT) + 1);
 	if(webgui_root == NULL) {
 		logprintf(LOG_ERR, "out of memory");
 		exit(EXIT_FAILURE);
@@ -187,17 +189,19 @@ static int settings_parse(JsonNode *root) {
 
 	while(jsettings) {
 		if(strcmp(jsettings->key, "port") == 0
-		   || strcmp(jsettings->key, "receive-repeats") == 0
-			 || strcmp(jsettings->key, "stats-enable") == 0) {
+			|| strcmp(jsettings->key, "receive-repeats") == 0
+			|| strcmp(jsettings->key, "stats-enable") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larger than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if((int)jsettings->number_ == 0) {
+			}
+			else if((int)jsettings->number_ == 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larger than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 #ifdef WEBSERVER
 				if(strcmp(jsettings->key, "port") == 0) {
 					own_port = (int)jsettings->number_;
@@ -205,7 +209,8 @@ static int settings_parse(JsonNode *root) {
 #endif
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-		} else if(strcmp(jsettings->key, "firmware-gpio-reset") == 0
+		}
+		else if(strcmp(jsettings->key, "firmware-gpio-reset") == 0
 			|| strcmp(jsettings->key, "firmware-gpio-sck") == 0
 			|| strcmp(jsettings->key, "firmware-gpio-mosi") == 0
 			|| strcmp(jsettings->key, "firmware-gpio-miso") == 0) {
@@ -220,72 +225,88 @@ static int settings_parse(JsonNode *root) {
 				have_error = 1;
 				goto clear;
 #if !defined(__FreeBSD__) && !defined(_WIN32)
-			} else if(wiringXValidGPIO((int)jsettings->number_) != 0) {
+			}
+			else if(wiringXValidGPIO((int)jsettings->number_) != 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid GPIO number", jsettings->key);
 				have_error = 1;
 				goto clear;
 #endif
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-		} else if(strcmp(jsettings->key, "standalone") == 0 ||
-							strcmp(jsettings->key, "watchdog-enable") == 0 ||
-							strcmp(jsettings->key, "ntp-sync") == 0) {
+		}
+		else if(strcmp(jsettings->key, "standalone") == 0 ||
+			strcmp(jsettings->key, "watchdog-enable") == 0 ||
+			strcmp(jsettings->key, "ntp-sync") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
+			}
+			else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-		} else if(strcmp(jsettings->key, "log-level") == 0) {
+		}
+		else if(strcmp(jsettings->key, "log-level") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number from 0 till 5", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if((int)jsettings->number_ < 0 || (int)jsettings->number_ > 5) {
+			}
+			else if((int)jsettings->number_ < 0 || (int)jsettings->number_ > 5) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number from 0 till 5", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
 #ifndef _WIN32
-		} else if(strcmp(jsettings->key, "pid-file") == 0 || strcmp(jsettings->key, "log-file") == 0) {
+		}
+		else if(strcmp(jsettings->key, "pid-file") == 0 || strcmp(jsettings->key, "log-file") == 0) {
 #else
-		} else if(strcmp(jsettings->key, "log-file") == 0) {
+		}
+		else if(strcmp(jsettings->key, "log-file") == 0) {
 #endif
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an existing path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(!jsettings->string_) {
+			}
+			else if(!jsettings->string_) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an existing file path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				if(path_exists(jsettings->string_) != EXIT_SUCCESS) {
 					logprintf(LOG_ERR, "config setting \"%s\" must point to an existing folder", jsettings->key);
 					have_error = 1;
 					goto clear;
-				} else {
+				}
+				else {
 					settings_add_string(jsettings->key, jsettings->string_);
 				}
 			}
-		} else if(strcmp(jsettings->key, "whitelist") == 0) {
+		}
+		else if(strcmp(jsettings->key, "whitelist") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid ip address", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(!jsettings->string_) {
+			}
+			else if(!jsettings->string_) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid ip addresses", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(strlen(jsettings->string_) > 0) {
+			}
+			else if(strlen(jsettings->string_) > 0) {
 #if !defined(__FreeBSD__) && !defined(_WIN32)
 				char validate[] = "^((\\*|[0-9]|[1-9][0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\\.(\\*|[0-9]|[1-9][0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\\.(\\*|[0-9]|[1-9][0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\\.(\\*|[0-9]|[1-9][0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))(,[\\ ]|,|$))+$";
 				reti = regcomp(&regex, validate, REG_EXTENDED);
@@ -303,7 +324,7 @@ static int settings_parse(JsonNode *root) {
 				}
 				regfree(&regex);
 #endif
-				int l = (int)strlen(jsettings->string_)-1;
+				int l = (int)strlen(jsettings->string_) - 1;
 				if(jsettings->string_[l] == ' ' || jsettings->string_[l] == ',') {
 					logprintf(LOG_ERR, "config setting \"%s\" must contain valid ip addresses", jsettings->key);
 					have_error = 1;
@@ -314,92 +335,111 @@ static int settings_parse(JsonNode *root) {
 #ifdef WEBSERVER
 
 #ifdef WEBSERVER_SSL
-		} else if(strcmp(jsettings->key, "webserver-ssl-port") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-ssl-port") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larget than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->number_ < 0) {
+			}
+			else if(jsettings->number_ < 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larger than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				web_ssl_port = (int)jsettings->number_;
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
 #endif
-		} else if(strcmp(jsettings->key, "webserver-port") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-port") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larget than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->number_ < 0) {
+			}
+			else if(jsettings->number_ < 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a number larger than 0", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				web_port = (int)jsettings->number_;
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-		} else if(strcmp(jsettings->key, "webserver-root") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-root") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(!jsettings->string_ || path_exists(jsettings->string_) != 0) {
+			}
+			else if(!jsettings->string_ || path_exists(jsettings->string_) != 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
-				if((webgui_root = REALLOC(webgui_root, strlen(jsettings->string_)+1)) == NULL) {
+			}
+			else {
+				if((webgui_root = REALLOC(webgui_root, strlen(jsettings->string_) + 1)) == NULL) {
 					logprintf(LOG_ERR, "out of memory");
 					exit(EXIT_FAILURE);
 				}
 				strcpy(webgui_root, jsettings->string_);
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-		} else if(strcmp(jsettings->key, "webserver-enable") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-enable") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
+			}
+			else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-		} else if(strcmp(jsettings->key, "webserver-cache") == 0 ||
-		          strcmp(jsettings->key, "webgui-websockets") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-cache") == 0 ||
+			strcmp(jsettings->key, "webgui-websockets") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
+			}
+			else if(jsettings->number_ < 0 || jsettings->number_ > 1) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be either 0 or 1", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
 #ifndef _WIN32
-		} else if(strcmp(jsettings->key, "webserver-user") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webserver-user") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid system user", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ || strlen(jsettings->string_) > 0) {
+			}
+			else if(jsettings->string_ || strlen(jsettings->string_) > 0) {
 				if(name2uid(jsettings->string_) == -1) {
 					logprintf(LOG_ERR, "config setting \"%s\" must contain a valid system user", jsettings->key);
 					have_error = 1;
 					goto clear;
-				} else {
+				}
+				else {
 					settings_add_string(jsettings->key, jsettings->string_);
 				}
 			}
 #endif
-		} else if(strcmp(jsettings->key, "webserver-authentication") == 0 && jsettings->tag == JSON_ARRAY) {
+		}
+		else if(strcmp(jsettings->key, "webserver-authentication") == 0 && jsettings->tag == JSON_ARRAY) {
 			JsonNode *jtmp = json_first_child(jsettings);
 			unsigned short i = 0;
 			while(jtmp) {
@@ -407,10 +447,12 @@ static int settings_parse(JsonNode *root) {
 				if(jtmp->tag == JSON_STRING) {
 					if(i == 1) {
 						settings_add_string("webserver-authentication-username", jtmp->string_);
-					} else if(i == 2) {
+					}
+					else if(i == 2) {
 						settings_add_string("webserver-authentication-password", jtmp->string_);
 					}
-				} else {
+				}
+				else {
 					have_error = 1;
 					break;
 				}
@@ -425,17 +467,20 @@ static int settings_parse(JsonNode *root) {
 				have_error = 1;
 				goto clear;
 			}
-		} else if(strcmp(jsettings->key, "webgui-template") == 0) {
+		}
+		else if(strcmp(jsettings->key, "webgui-template") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be a valid template", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be a valid template", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
-				if((webgui_tpl = REALLOC(webgui_tpl, strlen(jsettings->string_)+1)) == NULL) {
+			}
+			else {
+				if((webgui_tpl = REALLOC(webgui_tpl, strlen(jsettings->string_) + 1)) == NULL) {
 					logprintf(LOG_ERR, "out of memory");
 					exit(EXIT_FAILURE);
 				}
@@ -443,7 +488,8 @@ static int settings_parse(JsonNode *root) {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
 #endif // WEBSERVER
-		} else if(strcmp(jsettings->key, "ntp-servers") == 0 && jsettings->tag == JSON_ARRAY) {
+		}
+		else if(strcmp(jsettings->key, "ntp-servers") == 0 && jsettings->tag == JSON_ARRAY) {
 			JsonNode *jtmp = json_first_child(jsettings);
 			unsigned short i = 0;
 			char name[25];
@@ -451,7 +497,8 @@ static int settings_parse(JsonNode *root) {
 				if(jtmp->tag == JSON_STRING) {
 					sprintf(name, "ntpserver%d", i);
 					settings_add_string(name, jtmp->string_);
-				} else {
+				}
+				else {
 					have_error = 1;
 					break;
 				}
@@ -463,34 +510,40 @@ static int settings_parse(JsonNode *root) {
 				have_error = 1;
 				goto clear;
 			}
-		} else if(strcmp(jsettings->key, "protocol-root") == 0 ||
-							strcmp(jsettings->key, "hardware-root") == 0 ||
-							strcmp(jsettings->key, "actions-root") == 0 ||
-							strcmp(jsettings->key, "functions-root") == 0 ||
-							strcmp(jsettings->key, "operators-root") == 0) {
+		}
+		else if(strcmp(jsettings->key, "protocol-root") == 0 ||
+			strcmp(jsettings->key, "hardware-root") == 0 ||
+			strcmp(jsettings->key, "actions-root") == 0 ||
+			strcmp(jsettings->key, "functions-root") == 0 ||
+			strcmp(jsettings->key, "operators-root") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(!jsettings->string_ || path_exists(jsettings->string_) != 0) {
+			}
+			else if(!jsettings->string_ || path_exists(jsettings->string_) != 0) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a valid path", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
 #ifdef EVENTS
-		} else if(strcmp(jsettings->key, "smtp-sender") == 0 ||
-					strcmp(jsettings->key, "smtp-user") == 0) {
+		}
+		else if(strcmp(jsettings->key, "smtp-sender") == 0 ||
+			strcmp(jsettings->key, "smtp-user") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an e-mail address", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an e-mail address", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(strlen(jsettings->string_) > 0) {
+			}
+			else if(strlen(jsettings->string_) > 0) {
 #if !defined(__FreeBSD__) && !defined(_WIN32)
 				char validate[] = "^[a-zA-Z0-9_.]+@([a-zA-Z0-9]+\\.)+([a-zA-Z0-9]{2,3}){1,2}$";
 				reti = regcomp(&regex, validate, REG_EXTENDED);
@@ -508,30 +561,36 @@ static int settings_parse(JsonNode *root) {
 				}
 				regfree(&regex);
 #endif
-			settings_add_string(jsettings->key, jsettings->string_);
-			}
-		} else if(strcmp(jsettings->key, "smtp-password") == 0) {
-			if(jsettings->tag != JSON_STRING) {
-				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
-				have_error = 1;
-				goto clear;
-			} else if(jsettings->string_ == NULL) {
-				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
-				have_error = 1;
-				goto clear;
-			} else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-		} else if(strcmp(jsettings->key, "smtp-host") == 0) {
+		}
+		else if(strcmp(jsettings->key, "smtp-password") == 0) {
+			if(jsettings->tag != JSON_STRING) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
+				have_error = 1;
+				goto clear;
+			}
+			else if(jsettings->string_ == NULL) {
+				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
+				have_error = 1;
+				goto clear;
+			}
+			else {
+				settings_add_string(jsettings->key, jsettings->string_);
+			}
+		}
+		else if(strcmp(jsettings->key, "smtp-host") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an smtp host address", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain an smtp host address", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(strlen(jsettings->string_) > 0) {
+			}
+			else if(strlen(jsettings->string_) > 0) {
 #if !defined(__FreeBSD__) && !defined(_WIN32)
 				char validate[] = "^([a-zA-Z0-9\\_\\-]){2,20}(\\.([a-zA-Z0-9\\_\\-]){2,20}){2,3}$";
 				reti = regcomp(&regex, validate, REG_EXTENDED);
@@ -551,84 +610,103 @@ static int settings_parse(JsonNode *root) {
 #endif
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-		} else if(strcmp(jsettings->key, "smtp-port") == 0) {
+		}
+		else if(strcmp(jsettings->key, "smtp-port") == 0) {
 			if(jsettings->tag != JSON_NUMBER) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be 25, 465 or 587", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if((int)jsettings->number_ != 25 && (int)jsettings->number_ != 465 && (int)jsettings->number_ != 587) {
+			}
+			else if((int)jsettings->number_ != 25 && (int)jsettings->number_ != 465 && (int)jsettings->number_ != 587) {
 				logprintf(LOG_ERR, "config setting \"%s\" must be 25, 465 or 587", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_number(jsettings->key, (int)jsettings->number_);
 			}
-        
-        // settings for sipcall    
-        } else if(strcmp(jsettings->key, "sip-program") == 0) {
+
+		}
+		// settings for sipcall    
+		else if(strcmp(jsettings->key, "sip-program") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a program string (e.e. '/home/pi/sipcall/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a program string (e.e. '/home/pi/sipcall/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        } else if(strcmp(jsettings->key, "sip-domain") == 0) {
+		}
+		else if(strcmp(jsettings->key, "sip-domain") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a domain string (e.e. 'fritz.box')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a domain string (e.e. 'fritz.box')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        } else if(strcmp(jsettings->key, "sip-user") == 0) {
+		}
+		else if(strcmp(jsettings->key, "sip-user") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a user string (e.e. '621')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a user string (e.e. '621')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        } else if(strcmp(jsettings->key, "sip-password") == 0) {
+		}
+		else if(strcmp(jsettings->key, "sip-password") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a password string", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        } else if(strcmp(jsettings->key, "sip-ttspath") == 0) {
+		}
+		else if(strcmp(jsettings->key, "sip-ttspath") == 0) {
 			if(jsettings->tag != JSON_STRING) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttspath string (e.g. '/home/pi/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else if(jsettings->string_ == NULL) {
+			}
+			else if(jsettings->string_ == NULL) {
 				logprintf(LOG_ERR, "config setting \"%s\" must contain a ttspath string (e.g. '/home/pi/sipcall')", jsettings->key);
 				have_error = 1;
 				goto clear;
-			} else {
+			}
+			else {
 				settings_add_string(jsettings->key, jsettings->string_);
 			}
-        // end sipcall            
-            
+			// end sipcall  
+
 #endif //EVENTS
-		} else {
+		}
+		else {
 			logprintf(LOG_ERR, "config setting \"%s\" is invalid", jsettings->key);
 			have_error = 1;
 			goto clear;
@@ -638,7 +716,7 @@ static int settings_parse(JsonNode *root) {
 
 #ifdef WEBSERVER
 	if(webgui_tpl != NULL) {
-		char *tmp = MALLOC(strlen(webgui_root)+strlen(webgui_tpl)+13);
+		char *tmp = MALLOC(strlen(webgui_root) + strlen(webgui_tpl) + 13);
 		if(tmp == NULL) {
 			logprintf(LOG_ERR, "out of memory");
 			exit(EXIT_FAILURE);
@@ -692,17 +770,21 @@ static JsonNode *settings_sync(int level, const char *display) {
 				ntpservers = json_mkarray();
 			}
 			json_append_element(ntpservers, json_mkstring(tmp->string_));
-		} else {
+		}
+		else {
 			if(json_find_member(root, "ntp-servers") == NULL && ntpservers != NULL) {
 				json_append_member(root, "ntp-servers", ntpservers);
 			}
 			if(strcmp(tmp->name, "webserver-authentication-username") == 0 && tmp->type == JSON_STRING) {
 				username = tmp->string_;
-			} else if(strcmp(tmp->name, "webserver-authentication-password") == 0 && tmp->type == JSON_STRING) {
+			}
+			else if(strcmp(tmp->name, "webserver-authentication-password") == 0 && tmp->type == JSON_STRING) {
 				password = tmp->string_;
-			} else if(tmp->type == JSON_NUMBER) {
+			}
+			else if(tmp->type == JSON_NUMBER) {
 				json_append_member(root, tmp->name, json_mknumber((double)tmp->number_, 0));
-			} else if(tmp->type == JSON_STRING) {
+			}
+			else if(tmp->type == JSON_STRING) {
 				json_append_member(root, tmp->name, json_mkstring(tmp->string_));
 			}
 		}
@@ -747,7 +829,7 @@ void settings_init(void) {
 	config_register(&config_settings, "settings");
 	config_settings->readorder = 0;
 	config_settings->writeorder = 3;
-	config_settings->parse=&settings_parse;
-	config_settings->sync=&settings_sync;
-	config_settings->gc=&settings_gc;
+	config_settings->parse = &settings_parse;
+	config_settings->sync = &settings_sync;
+	config_settings->gc = &settings_gc;
 }

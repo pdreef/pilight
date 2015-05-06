@@ -1,7 +1,9 @@
 /*
-	Copyright (C) 2013 - 2014 CurlyMo & Niek
+	Copyright (C) 2015 PieterD
 
 	This file is part of pilight.
+
+	The code in this file is based on sendmail.h.
 
 	pilight is free software: you can redistribute it and/or modify it under the
 	terms of the GNU General Public License as published by the Free Software
@@ -14,7 +16,7 @@
 
 	You should have received a copy of the GNU General Public License
 	along with pilight. If not, see	<http://www.gnu.org/licenses/>
-*/
+	*/
 
 #ifndef _EVENT_ACTION_SIPCALL_H_
 #define _EVENT_ACTION_SIPCALL_H_
