@@ -5,17 +5,25 @@ Sipcall add's an event action to pilight.
 Requirements:
 -------
 - working sip-server, e.g. running on local Fritz!box
-- installed sip library, according to instructions on  
-    <http://binerry.de/post/29180946733/raspberry-pi-caller-and-answering-machine>  and  
-    <http://www.instructables.com/id/Raspberry-Pi-water-alarm-system/?ALLSTEPS> 
+- PJSUA API (<http://www.pjsip.org>)  
+- eSpeak (<http://espeak.sourceforge.net>)  
 
-Syntax:  
+Follow instructions on <http://binerry.de/post/29180946733/raspberry-pi-caller-and-answering-machine> but use <https://github.com/pdreef/sipcall> instead (put the code in e.g. /home/pi/sipcall and have your setting 'sip-program' point to this file)  
+You can modify sipcall.c to set voice generating options (eSpeak or Google Translate, language)  
+
+
+Syntax:
+-------  
     
     "rules": {   
-        "deurbel": {   
-            "rule": "IF deurbel.state IS on THEN sipcall PHONENUMMER **620 TTS \"Someone is at the door\" ",   
+        "deurbel1": {   
+            "rule": "IF deurbel.state IS on THEN switch DEVICE deurbel TO off AND sipcall PHONENUMMER **9 TTS \"Someone is at the door\" ",   
             "active": 1   
-        }   
+        },  
+        "deurbel12": {
+            "rule": "IF deurbel.state IS on THEN switch DEVICE deurbel TO off AND sipcall PHONENUMBER **9 TTSFILE doorbell.wav",  
+            "active": 1  
+        },  
     } 
           
     "settings": {  
@@ -23,12 +31,16 @@ Syntax:
         "sip-domain": "fritz.box",  
         "sip-user": "621",  
         "sip-password": "6211",  
-        "sip-ttsfile": "/home/pi/sipcall/play.wav"   
+        "sip-ttspath": "/home/pi/sipcall"   
     }  
     
-    
-PHONENUMBER: any valid phonenumber.   
-TTS (TextToSpeech): short message, will be translated to voice. Notice the escaped double quotes.
 
 
+_Action parameters:_  
+-
+PHONENUMBER: A valid phonenumber. On Fritz!box **9 calls all connected phones   
+TTS: (TextToSpeech): short message, will be translated to voice. Notice the escaped double quotes.  
+TTSFILE: File (default play.wav) to use for playback  
+
+Use TTS or TTSFile, not both.
 
