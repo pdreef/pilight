@@ -485,7 +485,7 @@ static void setup_sip(void)
 	status = pjsua_set_null_snd_dev();
 	if(status != PJ_SUCCESS) error_exit("Error disabling audio", status);
 
-	log_message("Done.\n");
+	log_message("Setting up pjsua ... Done.\n");
 }
 
 // helper for creating and registering sip-account
@@ -521,7 +521,7 @@ static void register_sip(void)
 	status = pjsua_acc_add(&cfg, PJ_TRUE, &acc_id);
 	if(status != PJ_SUCCESS) error_exit("Error adding account", status);
 
-	log_message("Done.\n");
+	log_message("Registering account ... Done.\n");
 }
 
 // helper for making calls over sip-account
@@ -540,7 +540,7 @@ static void make_sip_call()
 	status = pjsua_call_make_call(acc_id, &uri, 0, NULL, NULL, NULL);
 	if(status != PJ_SUCCESS) error_exit("Error making call", status);
 
-	log_message("Done.\n");
+	log_message("Starting call ... Done.\n");
 }
 
 // helper for creating call-media-player
@@ -570,7 +570,7 @@ static void create_player(pjsua_call_id call_id)
 	status = pjmedia_wav_player_set_eof_cb(play_port, NULL, &on_media_finished);
 	if(status != PJ_SUCCESS) error_exit("Error adding sound-playback callback", status);
 
-	log_message("Done.\n");
+	log_message("Creating player ... Done.\n");
 }
 
 // helper for creating call-recorder
@@ -590,7 +590,7 @@ static void create_recorder(pjsua_call_info ci)
 	pjsua_conf_port_id rec_port = pjsua_recorder_get_conf_port(rec_id);
 	pjsua_conf_connect(ci.conf_slot, rec_port);
 
-	log_message("Done.\n");
+	log_message("Creating recorder ... Done.\n");
 }
 
 // Google TTS:
@@ -610,7 +610,7 @@ static void tts_google(char *file)
 	log_message("\n");
 	speech_status = system(sox_command);
 	if(speech_status != 0) error_exit("Error while converting mp3 to wav", speech_status);
-	log_message("Done.\n");
+	log_message("Synthesizing speech with Google Translate ... Done.\n");
 }
 
 // synthesize speech / create message via espeak
@@ -626,7 +626,7 @@ static void tts_espeak(char *file)
 	speech_status = system(speech_command);
 	if(speech_status != 0) error_exit("Error while creating phone text", speech_status);
 
-	log_message("Done.\n");
+	log_message("Synthesizing speech with eSpeak ... Done.\n");
 }
 
 // handler for call-media-state-change-events
@@ -731,7 +731,7 @@ static void app_exit()
 		pjsua_call_hangup_all();
 		pjsua_destroy();
 
-		log_message("Done.\n");
+		log_message("Stopping application ... Done.\n");
 
 		exit(0);
 	}
