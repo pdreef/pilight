@@ -106,11 +106,6 @@ struct app_config {
 	int silent_mode;
 } app_cfg;
 
-// first set some default values
-app_cfg.tts_file = "play.wav";
-app_cfg.record_call = 0;
-app_cfg.repetition_limit = 3;
-app_cfg.silent_mode = 0;
 
 // global helper vars
 int call_confirmed = 0;
@@ -124,6 +119,7 @@ pjmedia_port *play_port;
 pjsua_recorder_id rec_id = PJSUA_INVALID_ID;
 
 // header of helper-methods
+static int do_sipcall();
 static void create_player(pjsua_call_id);
 static void create_recorder(pjsua_call_info);
 static void log_message(char *);
@@ -132,8 +128,6 @@ static void register_sip(void);
 static void setup_sip(void);
 static void tts_google(char *);
 static void tts_espeak(char *);
-static void usage(int);
-static int try_get_argument(int, char *, char **, int, char *[]);
 
 // header of callback-methods
 static void on_call_media_state(pjsua_call_id);
@@ -255,7 +249,13 @@ static void *thread(void *param) {
 
 	char *ssipprogram = NULL, *ssipdomain = NULL, *ssipuser = NULL, *ssippassword = NULL, *ssipttspath = NULL;
 	char sipcmd[200];
-
+	
+	// first set some default values
+	app_cfg.tts_file = "play.wav";
+	app_cfg.record_call = 0;
+	app_cfg.repetition_limit = 3;
+	app_cfg.silent_mode = 0;
+	
 	jphonenumber = json_find_member(arguments, "PHONENUMBER");
 	jtts = json_find_member(arguments, "TTS");
 	jttsfile = json_find_member(arguments, "TTSFILE");
@@ -268,7 +268,7 @@ static void *thread(void *param) {
 	settings_find_string("sip-ttspath", &ssipttspath);
 
 	// TTS is given
-	if(jphonenumber != NULL && jtts != NULL) {
+	if(jtts != NULL) {
 		logprintf(LOG_DEBUG, "using TTS\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jtts, "value");
@@ -286,7 +286,7 @@ static void *thread(void *param) {
 				app_cfg.sip_password = ssippassword;
 				app_cfg.phone_number = jval1->string_;
 				app_cfg.tts = jval2->string_;
-				app_cfg.tts_file = ssipttspath + "/play.wav";
+				sprintf(app_cfg.tts_file, "%s/play.wav", ssipttspath);
 				if(do_sipcall() != 0) {
 					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
 				}
@@ -294,7 +294,7 @@ static void *thread(void *param) {
 		}
 	}
 	// TTSFILE is given, no tts
-	if(jphonenumber != NULL && jttsfile != NULL) {
+	if(jttsfile != NULL) {
 		logprintf(LOG_DEBUG, "using TTSFILE\n");
 		jvalues1 = json_find_member(jphonenumber, "value");
 		jvalues2 = json_find_member(jttsfile, "value");
@@ -311,8 +311,8 @@ static void *thread(void *param) {
 				app_cfg.sip_user = ssipuser;
 				app_cfg.sip_password = ssippassword;
 				app_cfg.phone_number = jval1->string_;
-				app_cfg.tts = null;
-				app_cfg.tts_file = ssipttspath + "/" + jval2->string_;
+				app_cfg.tts = NULL;
+				sprintf(app_cfg.tts_file, "%s/%s", ssipttspath, jval2->string_);
 				if(do_sipcall() != 0) {
 					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
 				}
@@ -320,26 +320,6 @@ static void *thread(void *param) {
 		}
 	}
 
-	// TTS is given, use play.wav as ttsfile
-	if(jphonenumber != NULL && jtts != NULL) {
-		logprintf(LOG_DEBUG, "using TTS\n");
-		jvalues1 = json_find_member(jphonenumber, "value");
-		jvalues2 = json_find_member(jttsfile, "value");
-
-		if(jvalues1 != NULL && jvalues2 != NULL) {
-			jval1 = json_find_element(jvalues1, 0);
-			jval2 = json_find_element(jvalues2, 0);
-			if(jval1 != NULL && jval2 != NULL &&
-				jval1->tag == JSON_STRING && jval2->tag == JSON_STRING) {
-
-				sprintf(sipcmd, "%s -sd %s -su %s -sp %s -pn %s -tts %s -ttsf %s/play.wav", ssipprogram, ssipdomain, ssipuser, ssippassword, jval1->string_, jval2->string_, ssipttspath);
-				logprintf(LOG_DEBUG, sipcmd);
-				if(system(sipcmd) != 0) {
-					logprintf(LOG_ERR, "Sipcall failed to call \"%s\"", jval1->string_);
-				}
-			}
-		}
-	}
 	action_sipcall->nrthreads--;
 
 	return (void *)NULL;
@@ -383,7 +363,7 @@ void init(void) {
 
 
 // main application
-static int sipcall() {
+static int do_sipcall() {
 	// print infos
 	log_message("SIP Call - Simple TTS-based Automated Calls\n");
 	log_message("===========================================\n");
